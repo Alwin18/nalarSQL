@@ -27,6 +27,14 @@ type PlanSelect struct {
 	Stmt *parser.SelectStmt
 }
 
+type PlanUpdate struct {
+	Stmt *parser.UpdateStmt
+}
+
+type PlanDelete struct {
+	Stmt *parser.DeleteStmt
+}
+
 func (p *Planner) Plan(stmt parser.Statement) (Plan, error) {
 	switch s := stmt.(type) {
 	case *parser.CreateTableStmt:
@@ -35,6 +43,10 @@ func (p *Planner) Plan(stmt parser.Statement) (Plan, error) {
 		return &PlanInsert{Stmt: s}, nil
 	case *parser.SelectStmt:
 		return &PlanSelect{Stmt: s}, nil
+	case *parser.UpdateStmt:
+		return &PlanUpdate{Stmt: s}, nil
+	case *parser.DeleteStmt:
+		return &PlanDelete{Stmt: s}, nil
 	default:
 		return nil, ErrUnsupportedPlan
 	}
