@@ -6,10 +6,11 @@ A simple SQL database engine with interactive CLI written in Go.
 
 - ✅ **CREATE TABLE** - Create tables with column definitions
 - ✅ **INSERT INTO** - Insert data into tables
-- ✅ **SELECT** - Query data with column projection
+- ✅ **SELECT** - Query data with column projection and table display
 - ✅ **UPDATE** - Update records with WHERE clause
 - ✅ **DELETE** - Delete records with WHERE clause
 - ✅ **Interactive CLI** - REPL interface for running SQL commands
+- ✅ **Beautiful Output** - Color-coded table display with proper formatting
 
 ## Building
 
@@ -21,6 +22,12 @@ go build -o nalarSql .
 
 ```bash
 ./nalarSql
+```
+
+Or run the demo:
+```bash
+chmod +x demo.sh
+./demo.sh
 ```
 
 ## Usage Examples
@@ -41,54 +48,68 @@ nalarSQL>
 
 ```sql
 nalarSQL> CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER);
-✅ <nil>
+✅ Query executed successfully
 ```
 
 ### Inserting Data
 
 ```sql
 nalarSQL> INSERT INTO users (id, name, age) VALUES (1, 'Alice', 30);
-✅ map[rowid:1]
+✅ Row inserted with ID: 1
 
 nalarSQL> INSERT INTO users (id, name, age) VALUES (2, 'Bob', 25);
-✅ map[rowid:2]
+✅ Row inserted with ID: 2
 ```
 
-### Selecting Data
+### Selecting Data (with Beautiful Table Display!)
 
 ```sql
 nalarSQL> SELECT * FROM users;
-✅ [map[age:30 id:1 name:Alice] map[age:25 id:2 name:Bob]]
-
-nalarSQL> SELECT name, age FROM users;
-✅ [map[age:30 name:Alice] map[age:25 name:Bob]]
+┌─────┬───────┬────┐
+│ age │ name  │ id │
+├─────┼───────┼────┤
+│ 30  │ Alice │ 1  │
+│ 25  │ Bob   │ 2  │
+└─────┴───────┴────┘
+2 rows returned
 ```
 
 ### Updating Data
 
 ```sql
 nalarSQL> UPDATE users SET age = 31 WHERE id = 1;
-✅ map[updated:1]
+✅ 1 row updated
 
 nalarSQL> SELECT * FROM users;
-✅ [map[age:31 id:1 name:Alice] map[age:25 id:2 name:Bob]]
+┌─────┬───────┬────┐
+│ age │ name  │ id │
+├─────┼───────┼────┤
+│ 31  │ Alice │ 1  │
+│ 25  │ Bob   │ 2  │
+└─────┴───────┴────┘
+2 rows returned
 ```
 
 ### Deleting Data
 
 ```sql
 nalarSQL> DELETE FROM users WHERE id = 2;
-✅ map[deleted:1]
+✅ 1 row deleted
 
 nalarSQL> SELECT * FROM users;
-✅ [map[age:31 id:1 name:Alice]]
+┌─────┬───────┬────┐
+│ age │ name  │ id │
+├─────┼───────┼────┤
+│ 31  │ Alice │ 1  │
+└─────┴───────┴────┘
+1 row returned
 ```
 
 ### Exiting
 
 ```sql
 nalarSQL> exit
-Goodbye! 👋
+👋 Goodbye!
 ```
 
 ## Architecture
