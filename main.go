@@ -1,38 +1,72 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/Alwin18/nalarSQL/engine"
 )
 
 func main() {
-	// Quick startup: initialize engine and run a sample SQL
+	// Initialize engine
 	e, err := engine.NewEngine(".data")
 	if err != nil {
-		panic(err)
+		fmt.Println("Error initializing engine:", err)
+		os.Exit(1)
 	}
 	defer e.Close()
 
-	sqls := []string{
-		`CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER);`,
-		`INSERT INTO users (id, name, age) VALUES (1, 'Alice', 30);`,
-		`INSERT INTO users (id, name, age) VALUES (2, 'Bob', 25);`,
-		`INSERT INTO users (id, name, age) VALUES (3, 'Charlie', 35);`,
-		`SELECT * FROM users;`,
-		`UPDATE users SET age = 31 WHERE id = 1;`,
-		`SELECT * FROM users;`,
-		`DELETE FROM users WHERE id = 2;`,
-		`SELECT * FROM users;`,
-	}
+	// Print welcome message
+	fmt.Println("┌─────────────────────────────────────┐")
+	fmt.Println("│   Welcome to nalarSQL Database!    │")
+	fmt.Println("│   Type 'exit' or 'quit' to exit    │")
+	fmt.Println("└─────────────────────────────────────┘")
+	fmt.Println()
 
-	for i, s := range sqls {
-		fmt.Printf("\n[%d] %s\n", i+1, s)
-		res, err := e.ExecSQL(s)
-		if err != nil {
-			fmt.Println("ERROR:", err)
+	// Create scanner for reading input
+	scanner := bufio.NewScanner(os.Stdin)
+
+	// REPL - Read-Eval-Print Loop
+	for {
+		// Print prompt
+		fmt.Print("nalarSQL> ")
+
+		// Read input
+		if !scanner.Scan() {
+			break
+		}
+
+		input := strings.TrimSpace(scanner.Text())
+
+		// Skip empty lines
+		if input == "" {
 			continue
 		}
-		fmt.Println("=>", res)
+
+		// Check for exit commands
+		inputLower := strings.ToLower(input)
+		if inputLower == "exit" || inputLower == "quit" || inputLower == "exit;" || inputLower == "quit;" {
+			fmt.Println("Goodbye! 👋")
+			break
+		}
+
+		// Execute SQL
+		res, err := e.ExecSQL(input)
+		if err != nil {
+			fmt.Println("❌ ERROR:", err)
+			continue
+		}
+
+		// Print result
+		fmt.Println("✅", res)
+		fmt.Println()
+	}
+
+	// Check for scanner errors
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading input:", err)
+		os.Exit(1)
 	}
 }
